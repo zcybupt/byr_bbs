@@ -4,7 +4,7 @@ import shutil
 
 
 def key_exactor(item):
-    return (item['id'], item["time"], item['article_contents'])
+    return (item['id'], item["time"][:10], item['article_contents'])
 
 def unique(item_list):
 
