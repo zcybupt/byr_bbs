@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
 import re
+import time
 
-from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch, helpers
 
 
 def get_mapping():
@@ -14,7 +15,6 @@ def get_mapping():
                         "article_contents": {
                             "type": "text",
                             "analyzer": "ik_smart",
-
                             "fields": {
                                 "keyword": {
                                     "type": "keyword",
@@ -23,25 +23,22 @@ def get_mapping():
                             }
                         },
                         "id": {
-                            "type": "keyword",
-
+                            "type": "keyword"
                         },
                         "pos": {
                             "type": "long"
                         },
                         "time": {
-                            "type": "keyword",
-
+                            "type": "keyword"
                         },
                         "user_name": {
-                            "type": "keyword",
-
+                            "type": "keyword"
                         },
                         "votedown_count": {
-                            "type": "long",
+                            "type": "long"
                         },
                         "voteup_count": {
-                            "type": "long",
+                            "type": "long"
                         }
                     }
                 },
@@ -49,19 +46,17 @@ def get_mapping():
                     "type": "long"
                 },
                 "poster": {
-                    "type": "keyword",
-
+                    "type": "keyword"
                 },
                 "reply_count": {
                     "type": "long"
                 },
                 "reply_time": {
-                    "type": "keyword",
+                    "type": "keyword"
                 },
                 "title": {
                     "type": "text",
                     "analyzer": "ik_smart",
-
                     "fields": {
                         "keyword": {
                             "type": "keyword",
@@ -70,7 +65,7 @@ def get_mapping():
                     }
                 },
                 "url": {
-                    "type": "keyword",
+                    "type": "keyword"
                 }
             }
         }
@@ -84,21 +79,41 @@ class LoadEs(object):
         if not self.es.indices.exists(index='byr_articles'):
             self.es.indices.create(index='byr_articles', body=get_mapping())
 
-    def process_item(self, fileName):
+    def process_item(self, fileName, batch_size=1000):
         i = 0
-        for line in open(fileName, "r"):
+        actions = []
+        start_time = time.time()
+        for line in open(fileName, "r", encoding="utf-8"):
             i += 1
             try:
-                item = json.loads(line)
+                item = json.loads(line.strip())
                 results = re.findall('https://bbs.byr.cn/#!article/(.*?)/(\d+)', item['url'])
+                if not results:
+                    continue
                 item_id = results[0][0] + results[0][1]
                 self.tmp_set.add(item['url'])
-                self.es.index(index='byr_articles', id=item_id, body=item)
+
+                action = {
+                    "_index": "byr_articles",
+                    "_id": item_id,
+                    "_source": item
+                }
+                actions.append(action)
+
+                if len(actions) >= batch_size:
+                    helpers.bulk(self.es, actions)
+                    actions.clear()
+                    print(f"已插入 {i} 条，唯一 URL 数量：{len(self.tmp_set)}", i / (time.time() - start_time))
+
             except Exception as e:
-                print(line)
-                print(e)
-            if i % 1000 == 0:
-                print(len(self.tmp_set))
+                print("解析失败的行：", line)
+                print("异常：", e)
+
+        if actions:
+            helpers.bulk(self.es, actions)
+            print(f"插入最后一批，总计 {i} 条记录")
+
+        print(f"所有数据导入完成，去重后 URL 数量：{len(self.tmp_set)}")
 
 
 def doLoadEs(fileName='byr_data.json'):
