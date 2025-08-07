@@ -7,7 +7,7 @@ es = Elasticsearch(hosts="http://localhost:9200")
 
 
 def search_demo():
-    words = [""]
+    words = ["tym"]
 
     dsl = {
         "query": {
@@ -21,8 +21,8 @@ def search_demo():
                             {
                                 "range": {
                                     'reply_time': {
-                                        # 'gte': '2022-01-01',
-                                        # 'lte': '2022-01-01',
+                                        # 'gte': '2025-06-01',
+                                        # 'lte': '2025-07-01',
                                     }
                                 }
                             }
@@ -100,9 +100,10 @@ def search_demo():
 
 
 def print_content(result):
-    print("改写以下内容，分为几点：")
+    print("总结以下内容：")
     for item in result["hits"]["hits"]:
-        print(item["_source"]["title"], item["_source"]["url"], item["_source"]["reply_time"])
+        # print(item["_source"]["title"], item["_source"]["url"], item["_source"]["reply_time"])
+        print(item["_source"]["title"], item["_source"]["reply_time"])
         key = lambda item: (int(item['voteup_count']))
         item['_source']['articles'].sort(key=key, reverse=True)
         cnt = 0
