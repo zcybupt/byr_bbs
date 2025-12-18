@@ -18,9 +18,9 @@ def get_demo():
             }
         },
         "sort": {
-            "articles.voteup_count": {
-                "order": "desc",
-            },
+            # "articles.voteup_count": {
+            #     "order": "desc",
+            # },
             "articles.time": {
                 "order": "desc",
             },

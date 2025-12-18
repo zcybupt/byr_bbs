@@ -17,7 +17,7 @@ def get_demo():
                     {
                         "range": {
                             'reply_time': {
-                                'gte': (datetime.datetime.now() - datetime.timedelta(days=3)).strftime("%Y-%m-%d")
+                                'gte': (datetime.datetime.now() - datetime.timedelta(days=30)).strftime("%Y-%m-%d")
                             }
                         }
                     }

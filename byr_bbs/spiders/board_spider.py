@@ -131,6 +131,7 @@ class BoardSpiderSpider(scrapy.Spider):
     def parse_board(self, response):
         json_dict = json.loads(response.body.decode('utf8'))
         json_boards = json_dict['data']['boards'][1:]
+        # json_boards.append(json.loads('''{"name":"","children":[{"id":"IWhisper","name":"悄悄话","children":[]}]}'''))
         for json_board in json_boards:
             for child_board in json_board['children']:
                 item = BoardItem()

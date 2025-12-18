@@ -24,7 +24,7 @@ def get_demo():
     for item in result["hits"]["hits"]:
         text = ''
         for article in item['_source']['articles']:
-            text = (text + "\n" + '=' * 20 + '\n' + article['article_contents'])
+            text = (text + "\n" + '=' * 20 + '\n' + article['id'] + ':' + article['article_contents'])
         print(item["_source"]["title"], item["_source"]["url"])
         print(text)
 
