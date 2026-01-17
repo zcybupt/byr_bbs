@@ -14,8 +14,8 @@ BOT_NAME = 'byr_bbs'
 SPIDER_MODULES = ['byr_bbs.spiders']
 NEWSPIDER_MODULE = 'byr_bbs.spiders'
 
-LOG_LEVEL = 'WARNING'
-DOWNLOAD_TIMEOUT = 15
+LOG_LEVEL = 'INFO'
+DOWNLOAD_TIMEOUT = 5
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 # USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36'
@@ -24,7 +24,9 @@ DOWNLOAD_TIMEOUT = 15
 ROBOTSTXT_OBEY = False
 
 # Configure maximum concurrent requests performed by Scrapy (default: 16)
-# CONCURRENT_REQUESTS = 32
+CONCURRENT_REQUESTS = 16
+RETRY_ENABLED = True
+RETRY_TIMES = 2
 
 # Configure a delay for requests for the same website (default: 0)
 # See https://doc.scrapy.org/en/latest/topics/settings.html#download-delay
@@ -55,8 +57,9 @@ ROBOTSTXT_OBEY = False
 # Enable or disable downloader middlewares
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
-    'byr_bbs.middlewares.proxy_pool.RandomProxy': 300,
-    'byr_bbs.middlewares.random_useragent.RandomUserAgent': 543,
+    # 'byr_bbs.middlewares.proxy_pool.RandomProxy': 300,
+    'byr_bbs.middlewares.random_useragent.RandomUserAgent': 300,
+    'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     # 'byr_bbs.middlewares.ByrBbsDownloaderMiddleware': 543,
 }
 
@@ -87,7 +90,7 @@ ITEM_PIPELINES = {
 
 # Enable and configure HTTP caching (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
-# HTTPCACHE_ENABLED = True
+HTTPCACHE_ENABLED = False
 # HTTPCACHE_EXPIRATION_SECS = 0
 # HTTPCACHE_DIR = 'httpcache'
 # HTTPCACHE_IGNORE_HTTP_CODES = []
